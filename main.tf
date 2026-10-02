@@ -11,12 +11,11 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-# Event notifications, access logging and cross-region replication
-# are intentionally out of scope for this small demonstration project.
-#checkov:skip=CKV2_AWS_62:Event notifications are not required for this demo project
-#checkov:skip=CKV_AWS_18:Access logging is not required for this demo project
-#checkov:skip=CKV_AWS_144:Cross-region replication is not required for this demo project
 resource "aws_s3_bucket" "demo" {
+  #checkov:skip=CKV2_AWS_62:Event notifications are out of scope for this demo
+  #checkov:skip=CKV_AWS_18:Access logging is out of scope for this demo
+  #checkov:skip=CKV_AWS_144:Cross-region replication is out of scope for this demo
+
   bucket_prefix = "devsecops-demo-"
 }
 
@@ -38,6 +37,8 @@ resource "aws_s3_bucket_versioning" "demo" {
 }
 
 resource "aws_kms_key" "s3" {
+  #checkov:skip=CKV2_AWS_64:Explicit KMS key policy is out of scope for this demo
+
   description             = "KMS key for DevSecOps S3 bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
@@ -71,6 +72,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "demo" {
 
     noncurrent_version_expiration {
       noncurrent_days = 90
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }
